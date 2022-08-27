@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Local Video Player</title>
+	<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+	<div>
+  	<input id="subfile" type="file">
+			<a id="subSelector"class = "button-68" href="#">Open Subtitles</a>
+	</div>
+</div>
+<center>
+	<div>
+		<p id="subval">Hello</p>
+	</div>	
+</center>
+
+<div class="container">
+	<div>
+		<button onclick="playSub()" class = "button-68" id="playSubs">Play Dialouges</button>
+	</div>
+</center>
+
+
+<script type="text/javascript">
+	const subsInput = document.getElementById('subfile');
+	const subButton = document.getElementById('subSelector');
+	const subPicker = document.getElementById('subfile');
+	var lines;
+	var time_line= 1;
+	var sub_line = 2;
+	var timer;
+	var timeoutID;
+
+	function playSub()
+	{
+		var line_time =[]; 
+		line_time = lines[time_line].replace("-->"," ");
+		line_time = line_time.replace("," , ":");
+		line_time = line_time.replace("," , ":");
+		line_time = line_time.split("  ");
+		var t1 = line_time[0].split(":");
+		var hrs = parseInt(t1[0],10) * 3600;
+		var mins = parseInt(t1[1],10) * 60;
+		var secs = parseInt(t1[2],10) * 1;
+		var mills = parseFloat(t1[3])/1000;
+		var dialouge_lower = hrs+mins+secs+mills;
+		t1 = line_time[1].split(":");
+		hrs = parseInt(t1[0],10) * 3600;
+		mins = parseInt(t1[1],10) * 60;
+		secs = parseInt(t1[2],10) * 1;
+		mills = parseFloat(t1[3])/1000;
+		var dialouge_upper = hrs+mins+secs+mills;
+
+		time_line+=4;
+		
+		line_time = lines[time_line].replace("-->","");
+		line_time = line_time.replace("," , ":");
+		line_time = line_time.replace("," , ":");
+		line_time = line_time.split("  ");
+		t1 = line_time[0].split(":");
+		hrs = parseInt(t1[0],10) * 3600;
+		mins = parseInt(t1[1],10) * 60;
+		secs = parseInt(t1[2],10) * 1;
+		mills = parseFloat(t1[3])/1000;
+		var next_dialouge_lower = hrs+mins+secs+mills;
+		var diff = next_dialouge_lower - dialouge_upper;
+
+		timer = parseFloat(((dialouge_upper - dialouge_lower))+ (diff))*1000;
+		document.getElementById("subval").innerHTML = lines[sub_line];    
+
+		timeoutID = setTimeout(() => 
+		{
+			playSub();
+		}, 
+		timer);
+  
+		if(sub_line < lines.length-1)
+		{
+			sub_line+=4;
+		}
+	}
+
+		// redirect filesButton click to hidden filesInput
+	subButton.addEventListener('click', e => 
+	{
+		subsInput.click();
+		e.preventDefault();
+		return false;
+	});
+		
+		// select local subtitle file and play it in the video player
+	subPicker.addEventListener('input', function(e) 
+	{
+	  var file = this.files[0];
+	  var reader = new FileReader();
+	  reader.onload = function(progressEvent)
+	  {
+	    lines = this.result.split(/\r\n|\n/);
+	  };
+	  reader.readAsText(file);	
+	});
+
+</script>
+</body>
+</html>
