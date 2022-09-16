@@ -1,109 +1,72 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<title>Local Video Player</title>
-	<link rel="stylesheet" href="css/styles.css">
+	<title>Read Text File</title>
 </head>
+
 <body>
-<div class="container">
-	<div>
-  	<input id="subfile" type="file">
-			<a id="subSelector"class = "button-68" href="#">Open Subtitles</a>
-	</div>
-</div>
-<center>
-	<div>
-		<p id="subval">Hello</p>
-	</div>	
-</center>
-
-<div class="container">
-	<div>
-		<button onclick="playSub()" class = "button-68" id="playSubs">Play Dialouges</button>
-	</div>
-</center>
-
-
+	<input type="file" onchange="loadFile(this.files[0])" id="inputfile">
+	<br>
+	<button onclick="makeSubs()">Display Subtitles</button>
+	<br>
+	<pre id="output"></pre>
+	
 <script type="text/javascript">
-	const subsInput = document.getElementById('subfile');
-	const subButton = document.getElementById('subSelector');
-	const subPicker = document.getElementById('subfile');
-	var lines;
-	var time_line= 1;
-	var sub_line = 2;
-	var timer;
-	var timeoutID;
 
-	function playSub()
+	var raw_lines=[];
+	var time=[];
+	var dialogue=[];
+
+
+	async function loadFile(file) 
 	{
-		var line_time =[]; 
-		line_time = lines[time_line].replace("-->"," ");
-		line_time = line_time.replace("," , ":");
-		line_time = line_time.replace("," , ":");
-		line_time = line_time.split("  ");
-		var t1 = line_time[0].split(":");
-		var hrs = parseInt(t1[0],10) * 3600;
-		var mins = parseInt(t1[1],10) * 60;
-		var secs = parseInt(t1[2],10) * 1;
-		var mills = parseFloat(t1[3])/1000;
-		var dialouge_lower = hrs+mins+secs+mills;
-		t1 = line_time[1].split(":");
-		hrs = parseInt(t1[0],10) * 3600;
-		mins = parseInt(t1[1],10) * 60;
-		secs = parseInt(t1[2],10) * 1;
-		mills = parseFloat(t1[3])/1000;
-		var dialouge_upper = hrs+mins+secs+mills;
+    	let text = await file.text();
+    	raw_lines = text.split(/\r\n|\n/);
+		raw_lines = raw_lines.filter(e => e != "");
+		raw_lines = raw_lines.filter(x => isNaN(x));
 
-		time_line+=4;
-		
-		line_time = lines[time_line].replace("-->","");
-		line_time = line_time.replace("," , ":");
-		line_time = line_time.replace("," , ":");
-		line_time = line_time.split("  ");
-		t1 = line_time[0].split(":");
-		hrs = parseInt(t1[0],10) * 3600;
-		mins = parseInt(t1[1],10) * 60;
-		secs = parseInt(t1[2],10) * 1;
-		mills = parseFloat(t1[3])/1000;
-		var next_dialouge_lower = hrs+mins+secs+mills;
-		var diff = next_dialouge_lower - dialouge_upper;
-
-		timer = parseFloat(((dialouge_upper - dialouge_lower))+ (diff))*1000;
-		document.getElementById("subval").innerHTML = lines[sub_line];    
-
-		timeoutID = setTimeout(() => 
+		for(var i=0;i<raw_lines.length;i++)
 		{
-			playSub();
-		}, 
-		timer);
-  
-		if(sub_line < lines.length-1)
+			raw_lines[i] = raw_lines[i].trim();
+		}
+
+		for(var i=0;i<raw_lines.length-1;i++)
 		{
-			sub_line+=4;
+			if(isNaN(raw_lines[i][0]) && isNaN(raw_lines[i+1][0]))
+			{
+				raw_lines[i] = raw_lines[i] +" "+ raw_lines[i+1];
+				raw_lines.splice(i+1,1);
+			}
+		}
+			document.getElementById("output").innerHTML = " ";
+  	}
+
+	function makeSubs()
+	{
+		for(var i=0;i<raw_lines.length;i++)
+		{
+			if(i%2 == 0)
+			{
+				time.push(raw_lines[i]);
+			}
+			else
+			{
+				dialogue.push(raw_lines[i]);
+			}
+		}
+		for(var i=0;i<time.length;i++)
+		{
+			time[i][0] = time[i][0].replace(",",":");
+			time[i][1] = time[i][1].replace(",",":");
+		}			
+		raw_lines.length=0;
+		for(var i=0;i<time.length;i++)
+		{
+			document.getElementById("output").innerHTML += time[i]+ '\n' + dialogue[i] + '\n';
 		}
 	}
-
-		// redirect filesButton click to hidden filesInput
-	subButton.addEventListener('click', e => 
-	{
-		subsInput.click();
-		e.preventDefault();
-		return false;
-	});
-		
-		// select local subtitle file and play it in the video player
-	subPicker.addEventListener('input', function(e) 
-	{
-	  var file = this.files[0];
-	  var reader = new FileReader();
-	  reader.onload = function(progressEvent)
-	  {
-	    lines = this.result.split(/\r\n|\n/);
-	  };
-	  reader.readAsText(file);	
-	});
-
 </script>
 </body>
+
 </html>
