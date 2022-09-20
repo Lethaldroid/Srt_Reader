@@ -72,9 +72,43 @@
 		for(var i=0;i<time.length;i++)
 		{
 			document.getElementById("output").innerHTML += time[i]+ '\n' + dialogue[i] + '\n';
-			console.log(time[i]+ '\n' + dialogue[i] + '\n');
+			// console.log(getSub_Seconds(time[i][0]));
+			// console.log(getSub_Millis(time[i][0]));
 		}
 	}
+
+	function getSub_Seconds(param)
+	{
+		/*
+		Pass this function the string format of time parameter and it will return you the 
+		time converted to seconds in integer format
+		*/
+		param = param.split(':');
+		var hours = parseInt(param[0]);
+		var minutes = parseInt(param[1]);
+		var seconds = parseInt(param[2]);
+		var millis = parseInt(param[3]);
+
+		var total_seconds = hours*3600 + minutes*60 + seconds + (millis/1000);
+		return total_seconds;
+	}
+
+	function getSub_Millis(param)
+	{
+		/*
+		Pass this function the string format of time parameter and it will return you the 
+		time converted to milliseconds in integer format
+		*/
+		param = param.split(':');
+		var hours = parseInt(param[0]);
+		var minutes = parseInt(param[1]);
+		var seconds = parseInt(param[2]);
+		var millis = parseInt(param[3]);
+
+		var total_millis = hours*3600000 + minutes*60000 + seconds*1000 + millis;
+		return total_millis;
+	}
+
 </script>
 </body>
 
