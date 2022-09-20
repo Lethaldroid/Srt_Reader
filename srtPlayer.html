@@ -21,6 +21,10 @@
 
 	async function loadFile(file) 
 	{
+    	time.length=0;
+    	dialogue.length=0;
+    	raw_lines.length=0;
+
     	let text = await file.text();
     	raw_lines = text.split(/\r\n|\n/);
 		raw_lines = raw_lines.filter(e => e != "");
@@ -39,11 +43,7 @@
 				raw_lines.splice(i+1,1);
 			}
 		}
-			document.getElementById("output").innerHTML = " ";
-  	}
 
-	function makeSubs()
-	{
 		for(var i=0;i<raw_lines.length;i++)
 		{
 			if(i%2 == 0)
@@ -55,15 +55,24 @@
 				dialogue.push(raw_lines[i]);
 			}
 		}
+
+		raw_lines.length=0;
+
 		for(var i=0;i<time.length;i++)
 		{
+			time[i] = time[i].split('-->');
 			time[i][0] = time[i][0].replace(",",":");
 			time[i][1] = time[i][1].replace(",",":");
-		}			
-		raw_lines.length=0;
+		}
+			document.getElementById("output").innerHTML = " ";
+  	}
+
+	function makeSubs()
+	{		
 		for(var i=0;i<time.length;i++)
 		{
 			document.getElementById("output").innerHTML += time[i]+ '\n' + dialogue[i] + '\n';
+			console.log(time[i]+ '\n' + dialogue[i] + '\n');
 		}
 	}
 </script>
