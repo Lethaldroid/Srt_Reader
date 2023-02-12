@@ -35,17 +35,23 @@
 			raw_lines[i] = raw_lines[i].trim();
 		}
 
-		for(var i=0;i<raw_lines.length-1;i++)
+		for (var i = 0; i < raw_lines.length-1; i++) 
 		{
-			if(isNaN(raw_lines[i][0]) && isNaN(raw_lines[i+1][0]))
-			{
-				raw_lines[i] = raw_lines[i] +" "+ raw_lines[i+1];
-				raw_lines.splice(i+1,1);
-			}
-		}
+		  let check_d1 = raw_lines[i].search("-->");
+		  let check_d2 = raw_lines[i+1].search("-->");
 
+		  if(check_d1 == -1 && check_d2 == -1 )
+		  {
+			raw_lines[i] = raw_lines[i] +" "+ raw_lines[i+1];
+			raw_lines.splice(i+1,1);
+			i = 0;
+		  }
+
+		}
+		
 		for(var i=0;i<raw_lines.length;i++)
 		{
+			
 			if(i%2 == 0)
 			{
 				time.push(raw_lines[i]);
