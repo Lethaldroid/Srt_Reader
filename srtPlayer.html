@@ -6,7 +6,7 @@
 </head>
 
 <body>
-	<input type="file" onchange="loadFile(this.files[0])" id="inputfile">
+	<input type="file" onchange="loadFile(this.files[0])" id="inputfile"></input>
 	<br>
 	<button onclick="makeSubs()">Display Subtitles</button>
 	<br>
@@ -14,9 +14,9 @@
 	
 <script type="text/javascript">
 
-	var raw_lines=[];
-	var time=[];
-	var dialogue=[];
+	raw_lines=[];
+	time=[];
+	dialogue=[];
 
 
 	async function loadFile(file) 
@@ -70,9 +70,48 @@
 			time[i][0] = time[i][0].replace(",",":");
 			time[i][1] = time[i][1].replace(",",":");
 		}
+// **changes for 50 millisec objective start here**
+
+		for(var i=0;i<time.length-1;i++)
+		{
+			if(getSub_Millis(time[i+1][0]) - getSub_Millis(time[i][1]) < 50)
+			{
+				console.log("Original starting time:", time[i][1]);
+    			console.log("Original stopping time:", time[i + 1][0]);
+				const timeDiff = getSub_Millis(time[i + 1][0]) - getSub_Millis(time[i][1]);
+    			const timeToAdd = Math.ceil((50 - timeDiff) / 2);
+
+				time[i][1] = adjustTime(time[i][1], -timeToAdd);
+    			time[i + 1][0] = adjustTime(time[i + 1][0], timeToAdd);
+
+				console.log("Adjusted starting time:", time[i][1]);
+    			console.log("Adjusted stopping time:", time[i + 1][0]);
+
+			}
+		}
 			document.getElementById("output").innerHTML = " ";
   	}
+	  
+	function adjustTime(timeStr, milliseconds) 
+	{
+		const timeInMillis = getSub_Millis(timeStr);
+		const adjustedTimeInMillis = timeInMillis + milliseconds;
+		
+		// Convert adjusted time in milliseconds back to the time string format
+		const hours = Math.floor(adjustedTimeInMillis / 3600000);
+		const minutes = Math.floor((adjustedTimeInMillis % 3600000) / 60000);
+		const seconds = Math.floor((adjustedTimeInMillis % 60000) / 1000);
+		const millis = adjustedTimeInMillis % 1000;
+	
+		return `${formatTimeComponent(hours)}:${formatTimeComponent(minutes)}:${formatTimeComponent(seconds)}:${formatTimeComponent(millis)}`;
+	}
 
+	function formatTimeComponent(component) 
+	{
+		// Helper function to format time components with leading zeros if necessary
+		return component.toString().padStart(2, '0');
+	}
+// **and end here**
 	function makeSubs()
 	{		
 		for(var i=0;i<time.length;i++)
@@ -82,6 +121,7 @@
 			// console.log(getSub_Millis(time[i][0]));
 		}
 	}
+
 
 	function getSub_Seconds(param)
 	{
